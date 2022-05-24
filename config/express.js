@@ -1,6 +1,7 @@
 var express = require('express');
 var bodyParser = require('body-parser');
 var load = require('express-load');
+var helmet = require('helmet');
 
 var cookieParser = require('cookie-parser');
 var session = require('express-session');
@@ -12,7 +13,7 @@ module.exports = function() {
 
     //Porta da aplicação	
     //app.set('port', 3000);
-    app.set('port', process.env.PORT || 5000);
+    app.set('port', process.env.PORT || 3000);
 
     //Middleware
     app.use(express.static('./public'));
@@ -34,6 +35,16 @@ module.exports = function() {
     app.use(passport.initialize());
     app.use(passport.session());
 
+    //Habilitará todos os Middlewares
+    //app.use(helmet()); 
+
+    //Habilitar Middlewares específicos
+    app.disable('x-powered-by');
+    //app.use(helmet.hidePoweredBy({ setTo: 'PHP 5.5.14' }));
+    app.use(helmet.xframe());
+    app.use(helmet.xssFilter());
+    app.use(helmet.nosniff());
+
 
     //Carregar pastas
     load('models', { cwd: 'app' })
@@ -41,6 +52,10 @@ module.exports = function() {
         .then('routes/auth.js')
         .then('routes')
         .into(app);
+
+    app.get('*', function(req, res) {
+        res.status(404).render('404');
+    });
 
     return app;
 };
