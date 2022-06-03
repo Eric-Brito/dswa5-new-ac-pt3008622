@@ -1,7 +1,4 @@
 module.exports = function(app) {
-
-    var sanitize = require('mongo-sanitize');
-
     var Contato = app.models.contato;
     var controller = {};
 
@@ -30,7 +27,6 @@ module.exports = function(app) {
     };
 
     controller.removeContato = function(req, res) {
-        //var _id = req.params.id;
         var _id = sanitize(req.params.id);
         Contato.deleteOne({ "_id": _id }).exec().then(
             function() {
@@ -43,15 +39,14 @@ module.exports = function(app) {
 
     controller.salvaContato = function(req, res) {
         var _id = req.body._id;
-
+        
         var dados = {
-            "nome": req.body.nome,
-            "email": req.body.email
+            "nome" : req.body.nome,
+            "email" : req.body.email,
+            "emergencia" : req.body.emergencia || null
         };
-
         if (_id) {
-            //Contato.findByIdAndUpdate(_id, req.body).exec().then(
-            Contato.findByIdAndUpdate(_id, dados).exec().then(
+            Contato.findByIdAndUpdate(_id, req.body).exec().then(
                 function(contato) {
                     res.json(contato);
                 },
